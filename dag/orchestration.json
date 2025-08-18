@@ -1,0 +1,41 @@
+{
+  "Comment": "Step Function: Lambda -> Glue -> End, with error handling",
+  "StartAt": "GetDailyCurrencyRatesAPI",
+  "States": {
+    "GetDailyCurrencyRatesAPI": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:442426890415:function:GetCurrencyExchangeRates:$LATEST",
+      "ResultPath": "$.lambdaResult",
+      "Next": "RunWeeklyAggregates",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Errors"
+        }
+      ]
+    },
+    "RunWeeklyAggregates": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "currency_rated_weekly_aggr"
+      },
+      "End": true,
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Errors"
+        }
+      ]
+    },
+    "Errors": {
+      "Type": "Fail",
+      "Error": "WorkflowFailed",
+      "Cause": "Lambda or Glue job failed"
+    }
+  }
+}
