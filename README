@@ -1,1 +1,0 @@
-This repo contains the code artitfacts for a data pipeline to fetch daily currency exchnage rates and build weekly aggregate rates. This solution is implemented completely using AWS Cloud native stack including services like Lamba, Glue, S3, StepFunction and EventBridge.
