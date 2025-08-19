@@ -14,9 +14,10 @@ The pipeline is scheduled to run daily from Monday to Saturday using an Amazon E
 <img width="552" height="557" alt="image" src="https://github.com/user-attachments/assets/5d9f1461-fabf-4fb6-aba8-381d4a99ec32" />
 
 ## Project Folder
-**Dag** : contains the definition of job orchestration using AWS Step Functions, outlining the flow of a data pipeline with the following components:
-**dataingestion**: Fetches currency rates data via an external API using AWS Lambda.
-**datatransformation** : Contains the scripts to execute the transformation logic , the sql logic is embedded with in the script and table definition to store the aggreagted results
+- **dag** : contains the definition of job orchestration using AWS Step Functions, outlining the flow of a data pipeline with the following components:
+- **dataingestion**: Fetches currency rates data via an external API using AWS Lambda.
+- **transformations** : Contains the scripts to execute the transformation logic , the sql logic is embedded with in the script and table definition to store the aggreagted results
+  
 The entire pipeline is orchestrated using AWS Step Functions and scheduled via Amazon EventBridge (cron scheduler) to run daily from Monday to Saturday, ensuring seamless coordination between the ingestion and transformation stages.
 
 ## Sample Output
