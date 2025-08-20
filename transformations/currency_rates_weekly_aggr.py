@@ -32,6 +32,25 @@ Group By currency_code, amount, week_num
 Order by currency_code asc, week_num asc
 '''
 
+rolling_avg_7d_query='''
+WITH transformed_currency_rates AS (
+    SELECT 
+        currencycode,
+        amount, 
+        CAST(validFor AS date) AS valid_for,
+        CAST(rate AS decimal(10,5)) AS exchange_rate
+    FROM finance.currency_exchange_rates_daily
+)
+
+SELECT
+    currencycode,
+    amount,
+    valid_for,
+    AVG(exchange_rate) OVER (PARTITION BY currencycode ORDER BY valid_for ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS rolling_avg_7d
+FROM transformed_currency_rates
+order by currencycode , valid_for
+'''
+
 def initiate_spark():
   
         spark_builder = SparkSession.builder \
@@ -57,4 +76,5 @@ if (__name__ == "__main__"):
     args = getResolvedOptions(sys.argv, ["JOB_NAME",])
     spark = initiate_spark()
     spark.sql(weekly_aggregated_query)
+
 
