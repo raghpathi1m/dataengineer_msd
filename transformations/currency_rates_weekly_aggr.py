@@ -31,6 +31,29 @@ FROM transformed_currency_rates
 Group By currency_code, amount, week_num
 Order by currency_code asc, week_num asc
 '''
+monthly_aggregated_query = '''
+WITH transformed_currency_rates AS (
+    SELECT 
+        currency_code,
+        amount, 
+        CAST(validFor AS date) AS valid_for,
+        CAST(rate AS decimal(10,5)) AS exchange_rate,
+        monthofyear(CAST(validFor AS date)) AS month_nu
+    FROM default.currency_xchng_rates_daily
+)
+
+insert overwrite table default.exchange_rate_monthly_aggr partition (month_num)
+SELECT 
+    currency_code,
+    amount,    
+    AVG(exchange_rate)  AS avg_exchange_rate,
+    month_num
+FROM transformed_currency_rates
+Group By currency_code, amount, month_num
+Order by currency_code asc, month_num asc
+'''
+
+
 
 rolling_avg_7d_query='''
 WITH transformed_currency_rates AS (
@@ -75,6 +98,8 @@ def initiate_spark():
 if (__name__ == "__main__"):
     args = getResolvedOptions(sys.argv, ["JOB_NAME",])
     spark = initiate_spark()
-    spark.sql(weekly_aggregated_query)
+    #spark.sql(weekly_aggregated_query)
+    spark.sql(monthly_aggregated_query)
+
 
 
